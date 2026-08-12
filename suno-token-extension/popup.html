@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suno Workspace Exporter Options</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        width: 380px;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 16px;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid #1e293b;
+        padding-bottom: 10px;
+      }
+      .icon {
+        width: 38px; height: 38px;
+        background: linear-gradient(135deg, #10b981, #3b82f6);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      }
+      h1 { font-size: 15px; font-weight: 700; color: #f8fafc; }
+      p.sub { font-size: 11px; color: #94a3b8; }
+
+      .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #38bdf8;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .counter-box {
+        text-align: center;
+        padding: 10px;
+        background: #090d16;
+        border: 1px solid #3b82f6;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      .counter-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #38bdf8;
+        letter-spacing: -0.02em;
+      }
+      .counter-lbl {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+      }
+
+      .form-group {
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        margin-bottom: 4px;
+      }
+      select, input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        color: #f8fafc;
+        font-size: 12px;
+        font-weight: 600;
+        outline: none;
+      }
+      select:focus, input[type="text"]:focus {
+        border-color: #3b82f6;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #34d399;
+        margin-bottom: 10px;
+        background: #090d16;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #059669;
+      }
+      .checkbox-group input {
+        width: 16px; height: 16px; cursor: pointer;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.1s, opacity 0.15s;
+        margin-top: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .btn:hover { opacity: 0.9; }
+      .btn:active { transform: scale(0.98); }
+      .btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+      .btn-scan { background: #0284c7; color: white; }
+      .btn-secondary { background: #8b5cf6; color: white; }
+      .btn-danger { background: #334155; color: #f87171; border: 1px solid #475569; }
+
+      #logConsole {
+        font-family: monospace;
+        font-size: 11px;
+        color: #38bdf8;
+        background: #090d16;
+        border: 1px solid #1e293b;
+        border-radius: 6px;
+        padding: 8px;
+        height: 85px;
+        overflow-y: auto;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="icon">📥</div>
+      <div>
+        <h1>Suno Workspace Exporter</h1>
+        <p class="sub">Auto-Save Chunks to Folder (Up to 60k)</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="counter-box">
+        <div id="trackCounter" class="counter-val">0</div>
+        <div class="counter-lbl">Captured Songs / 60,000 Buffer</div>
+      </div>
+    </div>
+
+    <!-- Section 0: Resume Checkpoint Memory -->
+    <div class="card" style="border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.06); margin-bottom: 10px;">
+      <div class="section-title" style="color: #38bdf8; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span>📍 Checkpoint Resume Memory</span>
+        <span id="checkpointBadge" style="font-size: 9px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-weight: 700;">SAVED</span>
+      </div>
+      
+      <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.5; background: rgba(15, 23, 42, 0.6); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
+        <div><strong>📁 Workspace:</strong> <span id="lblLastWorkspace" style="color: #38bdf8;">My Personal Library</span></div>
+        <div><strong>🎵 Last Track:</strong> <span id="lblLastSongTitle" style="color: #f8fafc; font-weight: bold;">None</span></div>
+        <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;"><strong>🆔 Clip ID:</strong> <span id="lblLastClipId">None</span> • <span id="lblLastTimestamp">No checkpoint saved</span></div>
+      </div>
+
+      <button id="resumeScanBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; font-size: 12px; padding: 10px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);" data-tooltip="Navigate to last workspace and resume scanning starting after your last captured song">
+        📍 RESUME SCAN FROM LAST SONG & WORKSPACE
+      </button>
+    </div>
+
+    <!-- Section 1: Engine Checkboxes & Action Run Button -->
+    <div class="card" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.05);">
+      <div class="section-title" style="color: #34d399;">⚡ Engine Settings & Filters</div>
+      
+      <div class="checkbox-group" style="margin-bottom: 6px; background: rgba(56, 189, 248, 0.1); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);" data-tooltip="Mandatory Security Lock: Permanently active. Scans ONLY tracks created by the currently logged-in account. Cannot be disabled.">
+        <input type="checkbox" id="chkUserLock" checked disabled />
+        <label for="chkUserLock" style="margin:0; color:#38bdf8; font-weight: bold; cursor:not-allowed;">🔒 Mandatory User Lock (Permanently Enforced)</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Only export tracks generated by your logged-in account">
+        <input type="checkbox" id="chkOnlyPersonal" checked />
+        <label for="chkOnlyPersonal" style="margin:0; color:#f8fafc; cursor:pointer;">🔒 Only My Personal Tracks (Exclude explore/feed)</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Filter out empty or missing metadata entries">
+        <input type="checkbox" id="chkExcludeEmpty" checked />
+        <label for="chkExcludeEmpty" style="margin:0; color:#f8fafc; cursor:pointer;">🧹 Exclude Incomplete / Empty Tracks (No info)</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Remove duplicate clip IDs and identical titles">
+        <input type="checkbox" id="chkDeduplicate" checked />
+        <label for="chkDeduplicate" style="margin:0; color:#f8fafc; cursor:pointer;">👯 Deduplicate Songs (Remove doubles)</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Automatically dump JSON files to disk in chunks as you scroll">
+        <input type="checkbox" id="autoSaveToggle" checked />
+        <label for="autoSaveToggle" style="margin:0; color:#f8fafc; cursor:pointer;">💾 Continuous Auto-Offload to Disk</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Immediately purge offloaded songs from memory once saved to disk to prevent system RAM bloat">
+        <input type="checkbox" id="chkAutoPurgeRAM" checked />
+        <label for="chkAutoPurgeRAM" style="margin:0; color:#f8fafc; cursor:pointer;">⚡ Purge Memory Buffer After Offload (Zero RAM Bloat)</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 6px;" data-tooltip="Automatically recover, reload, and auto-resume scanning if Suno tab reloads or crashes">
+        <input type="checkbox" id="chkAutoHeal" checked />
+        <label for="chkAutoHeal" style="margin:0; color:#f8fafc; cursor:pointer;">🛡️ Auto-Heal & Auto-Resume Tab Crashes</label>
+      </div>
+
+      <div class="checkbox-group" style="margin-bottom: 10px;" data-tooltip="Fetch missing lyrics, style prompts, and artwork in background">
+        <input type="checkbox" id="chkAutoEnrich" checked />
+        <label for="chkAutoEnrich" style="margin:0; color:#f8fafc; cursor:pointer;">⚡ Background Auto-Fetch Missing Lyrics & Styles</label>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+        <button id="startCaptureBtn" class="btn btn-primary" style="font-size: 13px; padding: 10px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);" data-tooltip="Start scanning, auto-scrolling, and auto-offloading your songs">
+          ▶ START SCAN
+        </button>
+        <button id="stopCaptureBtn" class="btn btn-danger" style="font-size: 13px; padding: 10px; font-weight: 800; background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);" data-tooltip="Halt background scanning, auto-scroll, and downloads immediately">
+          ⏹ STOP SCAN
+        </button>
+      </div>
+    </div>
+
+    <!-- Section 2: What to Parse -->
+    <div class="card">
+      <div class="section-title">🔍 What to Parse (Metadata & Scope)</div>
+      
+      <div class="form-group">
+        <label for="fieldsPresetSelect">Metadata Fields Preset</label>
+        <select id="fieldsPresetSelect" data-tooltip="Choose which data fields to include in export">
+          <option value="all" selected>Full Metadata (Audio, Video, Lyrics, Tags, IDs, Timestamps)</option>
+          <option value="standard">Standard (Title, Audio URL, Lyrics, Tags, Image, Video)</option>
+          <option value="minimal">Minimal (ID, Title, Audio URL Only)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="filterScopeSelect">Filter Track Scope</label>
+        <select id="filterScopeSelect" data-tooltip="Filter tracks by workspace scope or lyrics status">
+          <option value="all" selected>All Captured Tracks in Storage Buffer</option>
+          <option value="workspace">Only Active Workspace / Playlist Tracks</option>
+          <option value="has_lyrics">Only Tracks with Lyrics/Prompts</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-top: 6px;">
+        <label for="scrollPaceSelect">Auto-Scroll Pace & Page Speed</label>
+        <select id="scrollPaceSelect" data-tooltip="Set scrolling step delay to match Suno page load speed. Includes automatic end-of-page detector to stop automatically at the bottom.">
+          <option value="2000" selected>🐢 2.0 Seconds (Recommended: Smooth & Auto-Stops at End)</option>
+          <option value="3000">🐌 3.0 Seconds (Ultra-Reliable: For Slow Internet)</option>
+          <option value="1200">⚡ 1.2 Seconds (Fast Mode)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section 3: Where & How to Save -->
+    <div class="card">
+      <div class="section-title">💾 Where & How to Save</div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="subfolderInput">Downloads Subfolder</label>
+          <input type="text" id="subfolderInput" value="SunoExports" placeholder="e.g. SunoExports" data-tooltip="Target subfolder in your Downloads directory" />
+        </div>
+        <div class="form-group">
+          <label for="filenamePrefixInput">Filename Prefix</label>
+          <input type="text" id="filenamePrefixInput" value="suno_workspace_export" placeholder="e.g. suno_export" data-tooltip="Prefix attached to exported JSON files" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="chunkSizeSelect">Chunk Threshold (Songs Per Offloaded File)</label>
+        <select id="chunkSizeSelect" data-tooltip="Offload JSON files to disk every N songs to keep browser RAM at 0MB bloat">
+          <option value="250">250 Songs / Chunk (Continuous Ultra-Fast Offload)</option>
+          <option value="500">500 Songs / Chunk (Fast Continuous Offload)</option>
+          <option value="1000" selected>1,000 Songs / Chunk (Standard Recommended)</option>
+          <option value="2500">2,500 Songs / Chunk</option>
+          <option value="5000">5,000 Songs / Chunk</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section 4: Single Song Direct Scraper -->
+    <div class="card">
+      <div class="section-title">🎯 Single Song / Clip Scraper</div>
+      <div class="form-group" style="margin-bottom: 6px;">
+        <input type="text" id="singleSongUrlInput" placeholder="Paste Suno Song URL or Clip ID..." data-tooltip="Paste Suno track link or clip ID to scrape immediately" />
+      </div>
+      <button id="scrapeSingleSongBtn" class="btn btn-scan" style="margin-top:0;" data-tooltip="Fetch metadata, lyrics, and audio for specified song URL">🎵 Scrape Song Lyrics & Style</button>
+    </div>
+
+    <!-- Section 5: Action Controls -->
+    <div class="card">
+      <button id="exportChunksBtn" class="btn btn-primary" data-tooltip="Download all captured tracks in storage to JSON files">📥 Download JSON in Chunks</button>
+      <button id="forceScanBtn" class="btn btn-scan" data-tooltip="Manually trigger immediate DOM & API scan of open Suno tab">⚡ Force Scan Page & DOM Now</button>
+      <button id="toggleScrollBtn" class="btn btn-secondary" data-tooltip="Start or stop automatic smooth scrolling down your Suno feed">📜 Toggle Auto-Scroll Capture (Past 240 limit)</button>
+      <button id="clearBufferBtn" class="btn btn-danger" data-tooltip="Empty all cached tracks from extension storage buffer">🗑️ Clear Storage Buffer</button>
+    </div>
+
+    <!-- Community Gift & Ko-fi Support -->
+    <div class="card" style="border: 1px solid #f472b6; background: rgba(244, 114, 182, 0.06); text-align: center;">
+      <div style="font-size: 12px; font-weight: 800; color: #f472b6; margin-bottom: 4px;">❤️ A Labour of Love & Gift to the Community</div>
+      <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4; margin-bottom: 8px;">
+        8 months of research & engineering for the Suno AI community. 100% Open Source — just give credit where credit is due!
+      </div>
+      <a href="https://ko-fi.com/andrewstatic" target="_blank" rel="noopener noreferrer" class="btn" style="background: #ff5e5b; color: #fff; text-decoration: none; font-weight: 800; font-size: 11px; padding: 8px; display: block; border-radius: 6px; box-shadow: 0 4px 12px rgba(255, 94, 91, 0.4);" data-tooltip="Support development on Ko-fi">
+        ☕ Buy Me a Coffee on Ko-fi
+      </a>
+    </div>
+
+    <!-- Special Thanks & Security Audit Attribution -->
+    <div class="card" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.08); text-align: center;">
+      <div style="font-size: 11px; font-weight: 800; color: #34d399; margin-bottom: 4px;">🛡️ Special Thanks to HeyMow for the Security Audit!</div>
+      <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4; margin-bottom: 8px;">
+        Huge appreciation to <strong>HeyMow</strong> for conducting the thorough security audit & hardening analysis for v7.0!
+      </div>
+      <a href="https://ko-fi.com/heymow" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; text-decoration: none; font-weight: 800; font-size: 11px; padding: 8px; display: block; border-radius: 6px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);" data-tooltip="Support HeyMow on Ko-fi">
+        ☕ Support HeyMow on Ko-fi
+      </a>
+    </div>
+
+    <div class="card">
+      <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px;">Live Progress Console</div>
+      <div id="logConsole">Ready. Auto-save enabled to SunoExports/ folder.</div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
