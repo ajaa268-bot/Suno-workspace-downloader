@@ -2967,11 +2967,31 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
 
                     const baseName = uniqueBaseName(song, subfolder);
 
+                    const sanitizeFilename = (filename) => {
+                        if (!filename) return 'file.txt';
+                        const lastDot = filename.lastIndexOf('.');
+                        let name = lastDot > 0 ? filename.slice(0, lastDot) : filename;
+                        let ext = lastDot > 0 ? filename.slice(lastDot + 1) : '';
+
+                        name = String(name || 'file')
+                            .replace(/[/\\?%*:|"<>]/g, '_')
+                            .replace(/[\x00-\x1f\x7f]/g, '')
+                            .replace(/^[-\s.]+|[\s.]+$|\.+$/g, '')
+                            .trim();
+
+                        if (!name || /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i.test(name)) {
+                            name = `${name || 'file'}_clean`;
+                        }
+
+                        ext = String(ext || '').replace(/[^a-zA-Z0-9]/g, '');
+                        return ext ? `${name}.${ext}` : name;
+                    };
+
                     // Never overwrite a file that is already there when user requested skipping
                     const alreadyOnDisk = async (filename) => {
                         if (!skipExisting) return false;
                         try {
-                            const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
+                            const cleanName = sanitizeFilename(filename);
                             await currentHandle.getFileHandle(cleanName, { create: false });
                             return true;
                         } catch (e) {
@@ -2980,8 +3000,8 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
                     };
 
                     const writeBlob = async (url, filename) => {
-                        const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
-                        if (await alreadyOnDisk(cleanName)) return 'skipped';
+                        const cleanName = sanitizeFilename(filename);
+                        if (await alreadyOnDisk(filename)) return 'skipped';
 
                         // 1. Fetch asset with 3-attempt retry loop & Extension Bridge fallback for TypeError
                         let blob = null;
@@ -3036,8 +3056,8 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
                     };
 
                     const writeText = async (filename, text) => {
-                        const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
-                        if (await alreadyOnDisk(cleanName)) return 'skipped';
+                        const cleanName = sanitizeFilename(filename);
+                        if (await alreadyOnDisk(filename)) return 'skipped';
 
                         let lastWriteErr = null;
                         for (let attempt = 1; attempt <= 3; attempt++) {
