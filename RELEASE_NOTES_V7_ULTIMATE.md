@@ -66,6 +66,11 @@ Huge appreciation and credit to **psychotic_d3v1l** for rigorous beta testing an
 - **`createLightweightClip()` Memory Sanitizer**: Strips raw 15KB API waveform payloads down to 0.5KB per track in `content_suno.js`, reducing RAM consumption by 95% during long scanning sessions.
 - **Live Counter Sync**: Unified `get_stats` API response so the floating page overlay and extension popup display the exact same live track count in real-time.
 
+### 9. 🔄 Infinite Auto-Scroll Keep-Alive Engine
+- **Premature Auto-Scroll Stop Fix**: Solved auto-scrolling stopping after 2,000–2,500 tracks by eliminating false bottom detection from React Virtual DOM height limits and API rate-limiting pauses.
+- **`chkKeepScrolling` Setting**: Added persistent keep-alive toggle in extension popup UI.
+- **Scroll-Bounce Re-triggering**: Automatically executes a 6-step scroll-bounce when idle to re-trigger Suno React `IntersectionObserver` sensors and resume API fetches continuously.
+
 ---
 
 ## 📂 Included Package Files

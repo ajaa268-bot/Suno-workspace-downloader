@@ -32,6 +32,12 @@ All notable changes, security enhancements, and performance optimizations for th
 8. **🎯 Live Counter Synchronization**:
    - Unified `get_stats` API response in `content_suno.js` and `popup.js` so both the floating page overlay and the extension popup UI display the exact same live track grand total in real-time.
 
+9. **🔄 Infinite Auto-Scroll Keep-Alive Engine**:
+   - Fixed premature auto-scroll stopping at 2,000–2,500 tracks caused by Suno React Virtual DOM height caps and API rate-limiting pauses.
+   - Added `chkKeepScrolling` toggle (`🔄 Infinite Auto-Scroll Keep-Alive`) in `popup.html` and `popup.js`.
+   - Added automated 6-step scroll-bounce re-triggering to keep Suno React `IntersectionObserver` active through API rate-limits.
+   - Expanded idle tolerance to 300 steps (~4–5 minutes) with multi-container bottom verification.
+
 ---
 
 ## [v7.0.0-ULTIMATE] - 2026-08-11
