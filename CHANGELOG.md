@@ -17,7 +17,11 @@ All notable changes, security enhancements, and performance optimizations for th
    - Replaced wildcard `'*'` postMessage target origins in `content_suno.js` and `injected.js` with `window.location.origin`.
 
 4. **❤️ Attribution & Ko-fi Support**:
-   - Added special thanks and Ko-fi links for **Andrew Static** (`https://ko-fi.com/andrewstatic`) and **HeyMow** (`https://ko-fi.com/heymow`) across popup UI, documentation, and GitHub releases.
+   - Added special thanks and Ko-fi links for **Andrew Static** (`https://ko-fi.com/andrewstatic`), **HeyMow** (`https://ko-fi.com/heymow`), and **psychotic_d3v1l** (`https://ko-fi.com/psychotic_d3v1l`) across documentation and GitHub releases.
+
+5. **🛠️ Batch Downloader Resilience (TypeError & InvalidStateError Fixes)**:
+   - Enhanced `sanitize()` to strip trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
+   - Added 3-attempt retry loop with exponential backoff for CDN network requests (`TypeError` handling) and stream abort cleanup for file writing locks.
 
 ---
 

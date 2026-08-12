@@ -54,9 +54,9 @@ Huge appreciation and credit to **psychotic_d3v1l** for rigorous beta testing an
 - **Origin Verification**: Replaced wildcard `'*'` postMessage targets in `content_suno.js` and `injected.js` with `window.location.origin`.
 - **Manifest V3 CSP & Scoping**: Host permissions strictly scoped to `suno.com` and `suno.ai`. Enforced strict `extension_pages` Content Security Policy.
 
-### 5. 🌉 Read-Only Extension Bridge & Icon Assets
-- **`bridge_organizer.js`**: Added read-only `chrome.storage.local` bridge for local `file://` organizer pages.
-- **Icon Set**: Included official extension icons (`icon16.png`, `icon32.png`, `icon48.png`, `icon128.png`).
+### 6. 🛠️ Batch Downloader Hardening (TypeError & InvalidStateError Fixes)
+- **Trailing Dot Sanitization**: `sanitize()` strips trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
+- **Network & File Stream Retries**: Added 3-attempt retry loop with exponential backoff for CDN fetch requests (`TypeError` handling) and stream abort cleanup for file writing locks.
 
 ---
 
