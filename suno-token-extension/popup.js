@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const lblLastTimestamp = document.getElementById('lblLastTimestamp');
   const checkpointBadge = document.getElementById('checkpointBadge');
   const resumeScanBtn = document.getElementById('resumeScanBtn');
+  const saveCheckpointBtn = document.getElementById('saveCheckpointBtn');
 
   const scrollPaceSelect = document.getElementById('scrollPaceSelect');
 
@@ -203,6 +204,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   }
 
+  if (saveCheckpointBtn) {
+    saveCheckpointBtn.onclick = async () => {
+      try {
+        const tab = await getSunoTab();
+        if (tab && tab.id) {
+          chrome.tabs.sendMessage(tab.id, { action: 'save_checkpoint_now' }, (res) => {
+            if (chrome.runtime.lastError || !res) {
+              log('Failed to save checkpoint. Is Suno tab active?', true);
+              return;
+            }
+            if (res.success && res.checkpoint) {
+              updateCheckpointDisplay(res.checkpoint);
+              log(`💾 Checkpoint saved: "${res.checkpoint.song_title}" (${res.checkpoint.workspace})`);
+            } else {
+              log('No scanned songs found yet to save as checkpoint.', true);
+            }
+          });
+        } else {
+          log('Please open Suno.com tab first to save checkpoint!', true);
+        }
+      } catch(e){}
+    };
+  }
+
   if (resumeScanBtn) {
     resumeScanBtn.onclick = async () => {
       try {
@@ -290,11 +315,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   function readStorageFallback() {
     try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        chrome.storage.local.get(['suno_captured_clips', 'offloaded_total_count', 'part_counter'], (result) => {
+        chrome.storage.local.get(['suno_captured_clips', 'offloaded_total_count', 'part_counter', 'last_checkpoint_state'], (result) => {
           if (chrome.runtime.lastError || !result) return;
           const clips = result.suno_captured_clips || [];
           const offloaded = result.offloaded_total_count || 0;
           const currentTotal = offloaded + clips.length;
+
+          if (result.last_checkpoint_state) {
+            updateCheckpointDisplay(result.last_checkpoint_state);
+          }
 
           if (trackCounter) trackCounter.textContent = currentTotal.toLocaleString();
 

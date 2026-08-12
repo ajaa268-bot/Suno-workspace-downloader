@@ -186,9 +186,14 @@
         <div style="font-size: 10px; color: #94a3b8; margin-top: 2px;"><strong>🆔 Clip ID:</strong> <span id="lblLastClipId">None</span> • <span id="lblLastTimestamp">No checkpoint saved</span></div>
       </div>
 
-      <button id="resumeScanBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; font-size: 12px; padding: 10px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);" data-tooltip="Navigate to last workspace and resume scanning starting after your last captured song">
-        📍 RESUME SCAN FROM LAST SONG & WORKSPACE
-      </button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+        <button id="saveCheckpointBtn" class="btn btn-secondary" style="background: linear-gradient(135deg, #059669, #047857); font-weight: 800; font-size: 11px; padding: 8px; color: #fff; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);" data-tooltip="Manually save current track & workspace checkpoint right now">
+          💾 SAVE CHECKPOINT
+        </button>
+        <button id="resumeScanBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; font-size: 11px; padding: 8px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);" data-tooltip="Navigate to last workspace and resume scanning starting after your last captured song">
+          📍 RESUME SCAN
+        </button>
+      </div>
     </div>
 
     <!-- Section 1: Engine Checkboxes & Action Run Button -->

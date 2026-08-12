@@ -112,6 +112,33 @@
 
   restoreStorageAndPrefs();
 
+  function saveCheckpointState(lastClip) {
+    if (!lastClip) {
+      if (window.__sunoSessionClips && window.__sunoSessionClips.size > 0) {
+        const allClips = Array.from(window.__sunoSessionClips.values());
+        lastClip = allClips[allClips.length - 1];
+      }
+    }
+    if (!lastClip || !lastClip.id) return null;
+
+    const wsName = scrapeActiveWorkspaceName(window.location.href) || lastClip.workspace || 'My Personal Library';
+    const checkpoint = {
+      workspace: wsName,
+      song_title: lastClip.title || 'Untitled Track',
+      song_id: lastClip.id,
+      url: window.location.href,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ 'last_checkpoint_state': checkpoint });
+      }
+    } catch(e){}
+
+    return checkpoint;
+  }
+
   // Debounced monotonic save to chrome.storage.local
   let saveTimeout = null;
   function syncStorageDebounced() {
@@ -130,11 +157,17 @@
             }
 
             const mergedArray = Array.from(window.__sunoSessionClips.values()).slice(0, 60000);
-            chrome.storage.local.set({ 
+            const lastTrack = mergedArray.length > 0 ? mergedArray[mergedArray.length - 1] : null;
+            const cpObj = saveCheckpointState(lastTrack);
+
+            const storagePayload = { 
               'suno_captured_clips': mergedArray,
               'offloaded_total_count': totalOffloadedCount,
               'part_counter': partCounter
-            }, () => {
+            };
+            if (cpObj) storagePayload['last_checkpoint_state'] = cpObj;
+
+            chrome.storage.local.set(storagePayload, () => {
               if (chrome.runtime.lastError) {
                 console.warn('[Suno Exporter] Storage save error:', chrome.runtime.lastError);
               }
@@ -901,6 +934,15 @@
     if (request.action === 'update_options') {
       restoreStorageAndPrefs();
       sendResponse({ success: true });
+      return true;
+    }
+
+    if (request.action === 'save_checkpoint_now') {
+      const cp = saveCheckpointState();
+      if (cp) {
+        showToastNotice(`💾 Checkpoint Saved: "${cp.song_title}" (${cp.workspace})`);
+      }
+      sendResponse({ success: !!cp, checkpoint: cp });
       return true;
     }
 
