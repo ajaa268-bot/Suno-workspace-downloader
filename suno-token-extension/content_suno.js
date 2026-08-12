@@ -147,13 +147,19 @@
 
   // Automatic Continuous Chunk Threshold Auto-Offloader (Offloads to disk & purges memory buffer)
   let isAutoSavingChunkLock = false;
+  let lastOffloadTime = 0;
 
   function checkAndAutoSaveChunk() {
     if (!isAutoSaveEnabled || isAutoSavingChunkLock || !isCaptureEngineActive) return;
-    const currentTotal = window.__sunoSessionClips.size;
+    if (Date.now() - lastOffloadTime < 5000) return; // Enforce 5s minimum cooldown between auto-saves
+
+    const activeRamSize = window.__sunoSessionClips.size;
+    const unsavedCount = isAutoPurgeRAM ? activeRamSize : (activeRamSize - lastAutoSavedCount);
     
-    if (currentTotal >= autoSaveChunkSize) {
+    if (unsavedCount >= autoSaveChunkSize && activeRamSize > 0) {
       isAutoSavingChunkLock = true;
+      lastOffloadTime = Date.now();
+
       const allClips = Array.from(window.__sunoSessionClips.values());
       const chunkData = allClips.slice(0, autoSaveChunkSize);
       const currentPart = partCounter;
@@ -161,6 +167,13 @@
       const wsName = scrapeActiveWorkspaceName(window.location.href);
       const cleanWsName = wsName.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '') || 'Workspace';
       const prefix = `suno_workspace_${cleanWsName}`;
+
+      // Mark progress immediately to prevent duplicate triggers
+      partCounter++;
+      totalOffloadedCount += chunkData.length;
+      if (!isAutoPurgeRAM) {
+        lastAutoSavedCount = window.__sunoSessionClips.size;
+      }
 
       try {
         if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id && chrome.runtime.sendMessage) {
@@ -172,40 +185,35 @@
             prefix: prefix
           }, (response) => {
             isAutoSavingChunkLock = false;
-            if (response && response.success) {
-              console.log(`[Continuous Offload Engine] Part ${currentPart} (${chunkData.length} songs) auto-saved to disk: ${response.filename}`);
-              
-              partCounter++;
-              totalOffloadedCount += chunkData.length;
-              noNewClipsScrollAttempts = 0;
-              lastCapturedCountForScroll = totalOffloadedCount + window.__sunoSessionClips.size;
+            noNewClipsScrollAttempts = 0;
+            lastCapturedCountForScroll = totalOffloadedCount + window.__sunoSessionClips.size;
 
-              if (isAutoPurgeRAM) {
-                // Purge offloaded clips from RAM memory to prevent browser bogging
-                for (const clip of chunkData) {
-                  const id = clip.id || clip.clip_id;
-                  if (id) window.__sunoSessionClips.delete(id);
-                }
-                const remainingArray = Array.from(window.__sunoSessionClips.values());
-                if (chrome.storage && chrome.storage.local) {
-                  chrome.storage.local.set({ 
-                    'suno_captured_clips': remainingArray,
-                    'offloaded_total_count': totalOffloadedCount,
-                    'part_counter': partCounter
-                  }, () => {
-                    updateShadowUIBadge();
-                  });
-                }
-                showToastNotice(`💾 Offloaded Part ${currentPart} (${chunkData.length} songs) to SunoExports/! RAM Memory Purged (0MB Bloat)`);
-              } else {
-                if (chrome.storage && chrome.storage.local) {
-                  chrome.storage.local.set({ 
-                    'offloaded_total_count': totalOffloadedCount,
-                    'part_counter': partCounter
-                  });
-                }
-                showToastNotice(`💾 Auto-Saved Part ${currentPart} (${chunkData.length} songs) to disk!`);
+            if (isAutoPurgeRAM) {
+              // Purge offloaded clips from RAM memory to prevent memory accumulation
+              for (const clip of chunkData) {
+                const id = clip.id || clip.clip_id;
+                if (id) window.__sunoSessionClips.delete(id);
               }
+              lastAutoSavedCount = 0;
+              const remainingArray = Array.from(window.__sunoSessionClips.values());
+              if (chrome.storage && chrome.storage.local) {
+                chrome.storage.local.set({ 
+                  'suno_captured_clips': remainingArray,
+                  'offloaded_total_count': totalOffloadedCount,
+                  'part_counter': partCounter
+                }, () => {
+                  updateShadowUIBadge();
+                });
+              }
+              showToastNotice(`💾 Offloaded Part ${currentPart} (${chunkData.length} songs) to SunoExports/! RAM Purged (0MB Bloat)`);
+            } else {
+              if (chrome.storage && chrome.storage.local) {
+                chrome.storage.local.set({ 
+                  'offloaded_total_count': totalOffloadedCount,
+                  'part_counter': partCounter
+                });
+              }
+              showToastNotice(`💾 Auto-Saved Part ${currentPart} (${chunkData.length} songs) to disk!`);
             }
           });
         } else {
