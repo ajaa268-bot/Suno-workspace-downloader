@@ -1,7 +1,7 @@
-# 🎉 Suno Workspace Exporter & Organizer Suite — v7.0 Ultimate Edition Release Notes
+# 🎉 Suno Workspace Exporter & Organizer Suite — v7.1 Ultimate Edition Release Notes
 
 **Release Date**: August 11, 2026  
-**Version**: `v7.0.0-ULTIMATE`  
+**Version**: `v7.1.0-ULTIMATE`  
 **Package**: `Suno_Workspace_Exporter_Portable.zip`
 
 ---

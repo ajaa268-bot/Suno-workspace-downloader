@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Standalone Suno Workspace Exporter v7.0 Ultimate Edition",
-  "version": "7.0",
+  "name": "Standalone Suno Workspace Exporter v7.1 Ultimate Edition",
+  "version": "7.1",
   "description": "Universal Exporter & Bridge for Suno AI workspaces and Portable Organizer Suite.",
   "permissions": [
     "cookies",

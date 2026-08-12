@@ -2,6 +2,25 @@
 
 All notable changes, security enhancements, and performance optimizations for this project are documented in this file.
 
+## [v7.1.0-ULTIMATE] - 2026-08-11
+
+### 🛠️ Download Spam Elimination & Service Worker Stability Patch
+
+1. **🚫 Download Spam Elimination**:
+   - Added `unsavedCount` tracking in `checkAndAutoSaveChunk()` so captured tracks are never re-downloaded repeatedly when RAM purging is turned off.
+   - Enforced a 5-second minimum cooldown lock (`lastOffloadTime`) between automatic chunk offloads.
+
+2. **⚡ Background Service Worker Fix**:
+   - Wrapped `chrome.downloads.download` in an async `Promise` in `background.js`, resolving `ReferenceError: sendResponse is not defined`.
+
+3. **🛡️ Origin Security Hardening**:
+   - Replaced wildcard `'*'` postMessage target origins in `content_suno.js` and `injected.js` with `window.location.origin`.
+
+4. **❤️ Attribution & Ko-fi Support**:
+   - Added special thanks and Ko-fi links for **Andrew Static** (`https://ko-fi.com/andrewstatic`) and **HeyMow** (`https://ko-fi.com/heymow`) across popup UI, documentation, and GitHub releases.
+
+---
+
 ## [v7.0.0-ULTIMATE] - 2026-08-11
 
 ### 🛡️ Ultimate Security, Sanitization & Portable Integration Merge

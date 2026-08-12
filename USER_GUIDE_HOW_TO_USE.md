@@ -31,7 +31,7 @@ Huge appreciation to **HeyMow** for conducting the thorough security audit and v
    - Click the button near the top left that says **"Load unpacked"**.
    - Browse to your folder: `auxplaylist_insights/suno-token-extension`
    - Click **Select Folder**.
-   - You will now see **Standalone Suno Workspace Exporter v7.0 Ultimate Edition** listed in your extensions!
+   - You will now see **Standalone Suno Workspace Exporter v7.1 Ultimate Edition** listed in your extensions!
 
 4. **Pin the Extension to Your Toolbar**:
    - Click the small **Puzzle Piece icon** 🧩 in the top-right corner of Chrome.
