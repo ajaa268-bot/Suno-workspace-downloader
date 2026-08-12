@@ -90,24 +90,24 @@ async function handleApiRequest(request) {
       const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
       const dataUrl = 'data:application/json;base64,' + base64Str;
 
-      chrome.downloads.download({
-        url: dataUrl,
-        filename: filename,
-        saveAs: false
-      }, (downloadId) => {
-        if (chrome.runtime.lastError) {
-          console.warn('[Background Auto-Save Error]', chrome.runtime.lastError);
-          sendResponse({ success: false, error: chrome.runtime.lastError.message });
-        } else {
-          console.log(`[Background Auto-Save] Part ${partNum} saved to ${filename} (Download ID: ${downloadId})`);
-          sendResponse({ success: true, filename: filename, downloadId: downloadId });
-        }
+      return await new Promise((resolve) => {
+        chrome.downloads.download({
+          url: dataUrl,
+          filename: filename,
+          saveAs: false
+        }, (downloadId) => {
+          if (chrome.runtime.lastError) {
+            console.warn('[Background Auto-Save Error]', chrome.runtime.lastError);
+            resolve({ success: false, error: chrome.runtime.lastError.message });
+          } else {
+            console.log(`[Background Auto-Save] Part ${partNum} saved to ${filename} (Download ID: ${downloadId})`);
+            resolve({ success: true, filename: filename, downloadId: downloadId });
+          }
+        });
       });
-      return true;
     } catch(err) {
       console.error('[Background Auto-Save Exception]', err);
-      sendResponse({ success: false, error: err.message });
-      return true;
+      return { success: false, error: err.message };
     }
   }
 
