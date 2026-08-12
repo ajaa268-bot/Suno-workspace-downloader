@@ -730,9 +730,14 @@
 
                     <div style="display: flex; gap: 0.5rem;">
                         <select id="select-sort" style="font-size: 0.85rem;">
-                            <option value="added-desc">Newest First</option>
-                            <option value="added-asc">Oldest First</option>
-                            <option value="title-asc">Title (A-Z)</option>
+                            <option value="created-desc">✨ Created Date (Newest First)</option>
+                            <option value="created-asc">✨ Created Date (Oldest First)</option>
+                            <option value="added-desc">📅 Added Date (Newest First)</option>
+                            <option value="added-asc">📅 Added Date (Oldest First)</option>
+                            <option value="title-asc">🔤 Title (A-Z)</option>
+                            <option value="title-desc">🔤 Title (Z-A)</option>
+                            <option value="artist-asc">🎤 Artist (A-Z)</option>
+                            <option value="duration-desc">⏱️ Duration (Longest First)</option>
                         </select>
                         
                         <div style="display: flex; background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 2px;">
@@ -1122,7 +1127,7 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
         let scrapedSongs = [];
         let activeCategory = 'all';
         let searchQuery = '';
-        let currentSort = 'added-desc';
+        let currentSort = 'created-desc';
         let currentView = 'grid';
         let directoryHandle = null;
         let isExporting = false;
@@ -1691,17 +1696,37 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
         }
 
         function sortSongList(result) {
-            const byAdded = (song) => {
-                const t = Date.parse(song.organizerAddedAt || '');
+            const parseTime = (dateStr) => {
+                if (!dateStr) return 0;
+                const t = Date.parse(dateStr);
                 return Number.isNaN(t) ? 0 : t;
             };
 
-            if (currentSort === 'title-asc') {
-                result.sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), undefined, { sensitivity: 'base' }));
+            const byAdded = (song) => parseTime(song.organizerAddedAt || song.added_at);
+            const byCreated = (song) => {
+                const raw = song.created_at || song.createdAt || song.created_time || song.organizerAddedAt;
+                const t = parseTime(raw);
+                return t > 0 ? t : byAdded(song);
+            };
+
+            if (currentSort === 'created-desc') {
+                result.sort((a, b) => byCreated(b) - byCreated(a));
+            } else if (currentSort === 'created-asc') {
+                result.sort((a, b) => byCreated(a) - byCreated(b));
             } else if (currentSort === 'added-asc') {
                 result.sort((a, b) => byAdded(a) - byAdded(b));
-            } else {
+            } else if (currentSort === 'added-desc') {
                 result.sort((a, b) => byAdded(b) - byAdded(a));
+            } else if (currentSort === 'title-asc') {
+                result.sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), undefined, { sensitivity: 'base' }));
+            } else if (currentSort === 'title-desc') {
+                result.sort((a, b) => String(b.title || '').localeCompare(String(a.title || ''), undefined, { sensitivity: 'base' }));
+            } else if (currentSort === 'artist-asc') {
+                result.sort((a, b) => String(a.artist || '').localeCompare(String(b.artist || ''), undefined, { sensitivity: 'base' }));
+            } else if (currentSort === 'duration-desc') {
+                result.sort((a, b) => (Number(b.duration) || 0) - (Number(a.duration) || 0));
+            } else {
+                result.sort((a, b) => byCreated(b) - byCreated(a));
             }
             return result;
         }
@@ -3809,6 +3834,7 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
             song.isSynced = !!song.isSynced;
             song.duration = Number(song.duration) || 0;
             song.model = String(song.model == null ? '' : song.model);
+            song.created_at = String(song.created_at || song.createdAt || song.created_time || song.organizerAddedAt || '');
             return song;
         }
 
