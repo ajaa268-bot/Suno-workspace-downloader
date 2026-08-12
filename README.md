@@ -97,6 +97,10 @@ Suno-workspace-downloader/
   Huge appreciation to **HeyMow** for conducting the security audit, path sanitization analysis, and vulnerability hardening work!  
   👉 **[Support HeyMow on Ko-fi](https://ko-fi.com/heymow)** (`https://ko-fi.com/heymow`)
 
+- 🧪 **Special Thanks to psychotic_d3v1l for Beta Testing**:  
+  Huge appreciation to **psychotic_d3v1l** for rigorous beta testing and feedback!  
+  👉 **[Support psychotic_d3v1l on Ko-fi](https://ko-fi.com/psychotic_d3v1l)** (`https://ko-fi.com/psychotic_d3v1l`)
+
 ---
 
 ## 📜 License

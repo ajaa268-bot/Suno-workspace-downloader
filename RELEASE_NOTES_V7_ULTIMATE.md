@@ -21,6 +21,15 @@ Huge appreciation and credit to **HeyMow** for conducting the comprehensive secu
 
 ---
 
+## 🧪 Special Thanks to psychotic_d3v1l for Beta Testing!
+
+Huge appreciation and credit to **psychotic_d3v1l** for rigorous beta testing and feedback!
+
+☕ **Support psychotic_d3v1l on Ko-fi**:  
+👉 **[https://ko-fi.com/psychotic_d3v1l](https://ko-fi.com/psychotic_d3v1l)**
+
+---
+
 ## 🚀 Key Features & Upgrades Implemented
 
 ### 1. 🏷️ Custom Workspace Naming & Individual Filtering
