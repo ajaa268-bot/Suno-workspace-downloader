@@ -2957,21 +2957,22 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
                         subfolder = sanitize(song.style || 'General');
                     }
 
-                    // Create subfolder structure inside local directory
+                    // Create subfolder structure inside local directory with sanitized parts
                     let currentHandle = directoryHandle;
                     const parts = subfolder.split('/').filter(p => p.length > 0);
                     for (const part of parts) {
-                        currentHandle = await currentHandle.getDirectoryHandle(part, { create: true });
+                        const cleanPart = sanitize(part);
+                        currentHandle = await currentHandle.getDirectoryHandle(cleanPart, { create: true });
                     }
 
                     const baseName = uniqueBaseName(song, subfolder);
 
-                    // Never overwrite a file that is already there when the user asked to
-                    // skip existing downloads.
+                    // Never overwrite a file that is already there when user requested skipping
                     const alreadyOnDisk = async (filename) => {
                         if (!skipExisting) return false;
                         try {
-                            await currentHandle.getFileHandle(filename, { create: false });
+                            const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
+                            await currentHandle.getFileHandle(cleanName, { create: false });
                             return true;
                         } catch (e) {
                             return false;
@@ -2979,22 +2980,84 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
                     };
 
                     const writeBlob = async (url, filename) => {
-                        if (await alreadyOnDisk(filename)) return 'skipped';
-                        const res = await fetch(url);
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        const blob = await res.blob();
-                        const handle = await currentHandle.getFileHandle(filename, { create: true });
-                        const writable = await handle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
+                        const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
+                        if (await alreadyOnDisk(cleanName)) return 'skipped';
+
+                        // 1. Fetch asset with 3-attempt retry loop & Extension Bridge fallback for TypeError
+                        let blob = null;
+                        let lastFetchErr = null;
+
+                        for (let attempt = 1; attempt <= 3; attempt++) {
+                            try {
+                                const res = await fetch(url);
+                                if (res.ok) {
+                                    blob = await res.blob();
+                                    break;
+                                } else {
+                                    lastFetchErr = new Error(`HTTP ${res.status}`);
+                                }
+                            } catch (fErr) {
+                                lastFetchErr = fErr;
+                                await new Promise(r => setTimeout(r, 350 * attempt));
+                            }
+                        }
+
+                        if (!blob && typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                            try {
+                                const bridgeRes = await new Promise(r => chrome.runtime.sendMessage({ action: "FETCH_SUNO_HTML", url: url }, r));
+                                if (bridgeRes && bridgeRes.success && bridgeRes.data) {
+                                    blob = new Blob([bridgeRes.data], { type: 'audio/mpeg' });
+                                }
+                            } catch (_) {}
+                        }
+
+                        if (!blob) throw lastFetchErr || new Error('Network fetch failed');
+
+                        // 2. Write file stream with 3-attempt retry loop for InvalidStateError
+                        let lastWriteErr = null;
+                        for (let attempt = 1; attempt <= 3; attempt++) {
+                            let writable = null;
+                            try {
+                                const handle = await currentHandle.getFileHandle(cleanName, { create: true });
+                                writable = await handle.createWritable();
+                                await writable.write(blob);
+                                await writable.close();
+                                return true;
+                            } catch (wErr) {
+                                lastWriteErr = wErr;
+                                if (writable) {
+                                    try { await writable.abort(); } catch(_) {}
+                                }
+                                await new Promise(r => setTimeout(r, 400 * attempt));
+                            }
+                        }
+
+                        throw lastWriteErr || new Error('File system write failed');
                     };
 
                     const writeText = async (filename, text) => {
-                        if (await alreadyOnDisk(filename)) return 'skipped';
-                        const handle = await currentHandle.getFileHandle(filename, { create: true });
-                        const writable = await handle.createWritable();
-                        await writable.write(text);
-                        await writable.close();
+                        const cleanName = filename.split('.').map(p => sanitize(p)).join('.');
+                        if (await alreadyOnDisk(cleanName)) return 'skipped';
+
+                        let lastWriteErr = null;
+                        for (let attempt = 1; attempt <= 3; attempt++) {
+                            let writable = null;
+                            try {
+                                const handle = await currentHandle.getFileHandle(cleanName, { create: true });
+                                writable = await handle.createWritable();
+                                await writable.write(text);
+                                await writable.close();
+                                return true;
+                            } catch (wErr) {
+                                lastWriteErr = wErr;
+                                if (writable) {
+                                    try { await writable.abort(); } catch(_) {}
+                                }
+                                await new Promise(r => setTimeout(r, 400 * attempt));
+                            }
+                        }
+
+                        throw lastWriteErr || new Error('File system write failed');
                     };
 
                     // The cover guess must use the same extension as the renderer (.jpeg);
@@ -3627,8 +3690,11 @@ Style tags, genre details, key, tempo, vocal traits, and instrumentation details
                 .replace(/[`$;&!(){}\[\]^~#]/g, '_')
                 // eslint-disable-next-line no-control-regex
                 .replace(/[\x00-\x1f\x7f]/g, ' ')
-                .replace(/^[-\s]+/, '')
+                .replace(/^[-\s.]+|[\s.]+$|\.+$/g, '')
                 .trim();
+            if (!cleaned || /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i.test(cleaned)) {
+                return `${cleaned || 'Default'}_clean`;
+            }
             return cleaned || 'Default';
         }
 
