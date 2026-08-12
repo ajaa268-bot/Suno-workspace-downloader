@@ -6,6 +6,8 @@
 [![Manifest](https://img.shields.io/badge/Manifest-MV3%20Compliant-blue.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
 [![Security](https://img.shields.io/badge/Security-Hardened%20%26%20Audited-emerald.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
+[![Buy Andrew a Coffee on Ko-fi](https://img.shields.io/badge/☕%20Buy%20Andrew%20a%20Coffee-Ko--fi-ff5e5b.svg)](https://ko-fi.com/andrewstatic)
+[![Support HeyMow on Ko-fi](https://img.shields.io/badge/🛡️%20Support%20HeyMow-Ko--fi-10b981.svg)](https://ko-fi.com/heymow)
 
 ---
 
