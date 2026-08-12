@@ -78,6 +78,7 @@
             autoSaveChunkSize = parseInt(result.exporter_opts.chunkSize, 10) || 1000;
             isAutoSaveEnabled = result.exporter_opts.autoSaveEnabled !== false;
             isAutoPurgeRAM = result.exporter_opts.autoPurgeRAM !== false;
+            isKeepScrollingEnabled = result.exporter_opts.keepScrolling !== false;
             if (result.exporter_opts.scrollPace) {
               autoScrollPaceMs = parseInt(result.exporter_opts.scrollPace, 10) || 2000;
             }
@@ -1141,20 +1142,37 @@
         lastCapturedCountForScroll = currentGrandTotal;
       } else {
         noNewClipsScrollAttempts++;
-        const windowAtBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120);
 
-        // Perform bounce scroll every 6 steps at bottom to trigger Suno React IntersectionObserver
-        if (windowAtBottom && noNewClipsScrollAttempts % 6 === 0) {
+        // Bounce scroll every 6 steps when idle to re-trigger Suno React IntersectionObserver & API fetches
+        if (noNewClipsScrollAttempts % 6 === 0) {
           try {
-            window.scrollBy({ top: -400, behavior: 'instant' });
+            window.scrollBy({ top: -500, behavior: 'instant' });
+            containers.forEach(c => { if (c && c !== window) c.scrollTop = Math.max(0, c.scrollTop - 500); });
             setTimeout(() => {
-              window.scrollBy({ top: 800, behavior: 'smooth' });
-            }, 180);
+              window.scrollBy({ top: 1000, behavior: 'smooth' });
+              containers.forEach(c => { if (c && c !== window) c.scrollTop += 1000; });
+            }, 200);
           } catch(e){}
         }
 
-        // Auto-stop ONLY after 120 consecutive idle steps (~100 seconds) AND window is confirmed at bottom
-        if (windowAtBottom && noNewClipsScrollAttempts >= 120) {
+        // Check if page or scroll containers are at bottom
+        let containerAtBottom = false;
+        try {
+          const windowBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 250);
+          const rootBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 250);
+          containerAtBottom = windowBottom || rootBottom;
+          for (const c of containers) {
+            if (c && c !== window && c.scrollHeight > 0) {
+              if (c.scrollTop + c.clientHeight >= c.scrollHeight - 250) {
+                containerAtBottom = true;
+                break;
+              }
+            }
+          }
+        } catch(e){}
+
+        // Auto-stop ONLY if keepScrolling is turned OFF and 300 idle steps (~4 minutes of verified zero new clips at page bottom) pass
+        if (!isKeepScrollingEnabled && containerAtBottom && noNewClipsScrollAttempts >= 300) {
           console.log('[Auto-Scroller] Complete workspace scan finished! Stopping scroller...');
           stopAutoScroll();
           offloadActiveWorkspaceToDisk('workspace_end_reached');

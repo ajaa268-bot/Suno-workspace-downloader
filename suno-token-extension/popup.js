@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const chkAutoEnrich = document.getElementById('chkAutoEnrich');
   const chkAutoPurgeRAM = document.getElementById('chkAutoPurgeRAM');
   const chkAutoHeal = document.getElementById('chkAutoHeal');
+  const chkKeepScrolling = document.getElementById('chkKeepScrolling');
   const chkUserLock = document.getElementById('chkUserLock');
   const startCaptureBtn = document.getElementById('startCaptureBtn');
   const stopCaptureBtn = document.getElementById('stopCaptureBtn');
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (typeof opts.autoSaveEnabled === 'boolean') autoSaveToggle.checked = opts.autoSaveEnabled;
           if (typeof opts.autoPurgeRAM === 'boolean') chkAutoPurgeRAM.checked = opts.autoPurgeRAM;
           if (typeof opts.autoHeal === 'boolean' && chkAutoHeal) chkAutoHeal.checked = opts.autoHeal;
+          if (typeof opts.keepScrolling === 'boolean' && chkKeepScrolling) chkKeepScrolling.checked = opts.keepScrolling;
           if (typeof opts.userLock === 'boolean' && chkUserLock) chkUserLock.checked = opts.userLock;
           if (typeof opts.onlyPersonal === 'boolean') chkOnlyPersonal.checked = opts.onlyPersonal;
           if (typeof opts.excludeEmpty === 'boolean') chkExcludeEmpty.checked = opts.excludeEmpty;
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       autoSaveEnabled: autoSaveToggle.checked,
       autoPurgeRAM: chkAutoPurgeRAM ? chkAutoPurgeRAM.checked : true,
       autoHeal: chkAutoHeal ? chkAutoHeal.checked : true,
+      keepScrolling: chkKeepScrolling ? chkKeepScrolling.checked : true,
       userLock: chkUserLock ? chkUserLock.checked : true,
       onlyPersonal: chkOnlyPersonal.checked,
       excludeEmpty: chkExcludeEmpty.checked,
@@ -243,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   }
 
-  [fieldsPresetSelect, filterScopeSelect, chunkSizeSelect, autoSaveToggle, chkAutoPurgeRAM, chkAutoHeal, chkOnlyPersonal, chkExcludeEmpty, chkDeduplicate, chkAutoEnrich].forEach(el => {
+  [fieldsPresetSelect, filterScopeSelect, chunkSizeSelect, autoSaveToggle, chkAutoPurgeRAM, chkAutoHeal, chkKeepScrolling, chkOnlyPersonal, chkExcludeEmpty, chkDeduplicate, chkAutoEnrich].forEach(el => {
     if (el) el.addEventListener('change', savePreferences);
   });
   [subfolderInput, filenamePrefixInput].forEach(el => {
