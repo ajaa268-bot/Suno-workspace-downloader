@@ -532,6 +532,31 @@
     return 'My Personal Library';
   }
 
+  function createLightweightClip(clip, existing = {}, scrapedWsName = '') {
+    const id = clip.id || clip.clip_id || clip.song_id || existing.id;
+    const title = extractTitle(clip, existing.title);
+    const artist = extractArtist(clip, existing.artist);
+
+    return {
+      id: id,
+      title: title,
+      artist: artist,
+      display_name: artist,
+      lyrics: extractLyrics(clip) !== 'No lyrics provided for this track.' ? extractLyrics(clip) : (existing.lyrics || 'No lyrics provided for this track.'),
+      prompt: extractLyrics(clip) !== 'No lyrics provided for this track.' ? extractLyrics(clip) : (existing.prompt || 'No lyrics provided for this track.'),
+      style: extractStyleTags(clip) !== 'None' ? extractStyleTags(clip) : (existing.style || 'None'),
+      image_url: extractImageUrl(clip, id) || existing.image_url || `https://cdn1.suno.ai/image_${id}.png`,
+      audio_url: clip.audio_url || existing.audio_url || `https://cdn1.suno.ai/${id}.mp3`,
+      video_url: extractVideoUrl(clip, id) || existing.video_url || `https://cdn1.suno.ai/${id}.mp4`,
+      workspace: clip.workspace_name || clip.metadata?.workspace_name || clip.project_name || clip.playlist_name || existing.workspace || scrapedWsName || 'My Personal Library',
+      created_at: clip.created_at || clip.createdAt || clip.created_time || existing.created_at || new Date().toISOString(),
+      duration: Number(clip.duration || clip.metadata?.duration || existing.duration) || 0,
+      model_name: clip.model_name || clip.major_model_version || existing.model_name || 'v3.5',
+      is_liked: !!(clip.is_liked || existing.is_liked),
+      is_trashed: !!(clip.is_trashed || existing.is_trashed)
+    };
+  }
+
   function captureClips(clips, targetWid, sourceUrl = '') {
     if (!isCaptureEngineActive) return 0;
     if (!clips || !Array.isArray(clips)) return 0;
@@ -580,21 +605,7 @@
         const title = extractTitle(clip, existing.title);
         const artist = extractArtist(clip, existing.artist);
 
-        const enriched = {
-          ...existing,
-          ...clip,
-          id: id,
-          title: title,
-          artist: artist,
-          display_name: artist,
-          lyrics: extractLyrics(clip) !== 'No lyrics provided for this track.' ? extractLyrics(clip) : (existing.lyrics || 'No lyrics provided for this track.'),
-          prompt: extractLyrics(clip) !== 'No lyrics provided for this track.' ? extractLyrics(clip) : (existing.prompt || 'No lyrics provided for this track.'),
-          style: extractStyleTags(clip) !== 'None' ? extractStyleTags(clip) : (existing.style || 'None'),
-          image_url: extractImageUrl(clip, id) || existing.image_url,
-          audio_url: clip.audio_url || existing.audio_url || `https://cdn1.suno.ai/${id}.mp3`,
-          video_url: extractVideoUrl(clip, id) || existing.video_url,
-          workspace: clip.workspace_name || clip.metadata?.workspace_name || clip.project_name || clip.playlist_name || existing.workspace || scrapedWsName || 'My Personal Library'
-        };
+        const enriched = createLightweightClip(clip, existing, scrapedWsName);
 
         const titleUpdated = title !== 'Untitled Track' && existing.title === 'Untitled Track';
         const artistUpdated = artist !== 'Suno Creator' && existing.artist === 'Suno Creator';
@@ -647,25 +658,7 @@
             const clipData = await res.json();
             if (clipData && (clipData.id || clipData.title)) {
               const existing = window.__sunoSessionClips.get(id) || {};
-              const title = extractTitle(clipData, existing.title);
-              const artist = extractArtist(clipData, existing.artist);
-
-              const enriched = {
-                ...existing,
-                ...clipData,
-                id: id,
-                title: title,
-                artist: artist,
-                display_name: artist,
-                lyrics: extractLyrics(clipData) !== 'No lyrics provided for this track.' ? extractLyrics(clipData) : (existing.lyrics || 'No lyrics provided for this track.'),
-                prompt: extractLyrics(clipData) !== 'No lyrics provided for this track.' ? extractLyrics(clipData) : (existing.prompt || 'No lyrics provided for this track.'),
-                style: extractStyleTags(clipData) !== 'None' ? extractStyleTags(clipData) : (existing.style || 'None'),
-                image_url: extractImageUrl(clipData, id) || existing.image_url,
-                audio_url: clipData.audio_url || existing.audio_url || `https://cdn1.suno.ai/${id}.mp3`,
-                video_url: extractVideoUrl(clipData, id) || existing.video_url,
-                workspace: clipData.workspace_name || clipData.metadata?.workspace_name || existing.workspace || 'Default Workspace'
-              };
-
+              const enriched = createLightweightClip(clipData, existing, existing.workspace);
               window.__sunoSessionClips.set(id, enriched);
               syncStorageDebounced();
             }
