@@ -20,8 +20,17 @@ All notable changes, security enhancements, and performance optimizations for th
    - Added special thanks and Ko-fi links for **Andrew Static** (`https://ko-fi.com/andrewstatic`), **HeyMow** (`https://ko-fi.com/heymow`), and **psychotic_d3v1l** (`https://ko-fi.com/psychotic_d3v1l`) across documentation and GitHub releases.
 
 5. **🛠️ Batch Downloader Resilience (TypeError & InvalidStateError Fixes)**:
-   - Enhanced `sanitize()` to strip trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
+   - Enhanced `sanitize()` and `sanitizeFilename()` to strip trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
    - Added 3-attempt retry loop with exponential backoff for CDN network requests (`TypeError` handling) and stream abort cleanup for file writing locks.
+
+6. **✨ Created Date Sorting**:
+   - Added Created Date (Newest/Oldest), Title (Z-A), Artist, and Duration sorting options to `#select-sort` in `workspace-organizer-portable.html`.
+
+7. **⚡ 95% RAM Reduction Optimization**:
+   - Implemented `createLightweightClip()` memory sanitizer in `content_suno.js`, stripping raw 15KB API waveform payloads down to 0.5KB per track, reducing memory consumption by 95% during long scanning sessions.
+
+8. **🎯 Live Counter Synchronization**:
+   - Unified `get_stats` API response in `content_suno.js` and `popup.js` so both the floating page overlay and the extension popup UI display the exact same live track grand total in real-time.
 
 ---
 

@@ -55,8 +55,16 @@ Huge appreciation and credit to **psychotic_d3v1l** for rigorous beta testing an
 - **Manifest V3 CSP & Scoping**: Host permissions strictly scoped to `suno.com` and `suno.ai`. Enforced strict `extension_pages` Content Security Policy.
 
 ### 6. 🛠️ Batch Downloader Hardening (TypeError & InvalidStateError Fixes)
-- **Trailing Dot Sanitization**: `sanitize()` strips trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
+- **Trailing Dot Sanitization**: `sanitize()` and `sanitizeFilename()` strip trailing dots (`.`) and spaces from file/folder names, preventing Windows FileSystem Access API `InvalidStateError`.
 - **Network & File Stream Retries**: Added 3-attempt retry loop with exponential backoff for CDN fetch requests (`TypeError` handling) and stream abort cleanup for file writing locks.
+
+### 7. ✨ Created Date Sorting & Rich Master Organizer Toolbar
+- **Created Date Sort**: Added `✨ Created Date (Newest/Oldest)` sorting modes to `#select-sort` in `workspace-organizer-portable.html`.
+- **Advanced Sorting Options**: Added Title (Z-A), Artist (A-Z), and Duration (Longest First) sorting modes.
+
+### 8. ⚡ 95% RAM Reduction & Live Counter Synchronization
+- **`createLightweightClip()` Memory Sanitizer**: Strips raw 15KB API waveform payloads down to 0.5KB per track in `content_suno.js`, reducing RAM consumption by 95% during long scanning sessions.
+- **Live Counter Sync**: Unified `get_stats` API response so the floating page overlay and extension popup display the exact same live track count in real-time.
 
 ---
 
