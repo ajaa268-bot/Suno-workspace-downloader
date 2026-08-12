@@ -1,8 +1,8 @@
-# 🎵 Suno Workspace Exporter & Portable Organizer Suite (v7.0 Ultimate Edition)
+# 🎵 Suno Workspace Exporter & Portable Organizer Suite (v7.1 Ultimate Edition)
 
 > **All-in-One Universal Offline Suno Workspace Exporter, Live API Scraper, Custom Workspace Organizer, and Command-Injection-Proof Batch Downloader.**
 
-[![Version](https://img.shields.io/badge/Version-v7.0--ULTIMATE-purple.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
+[![Version](https://img.shields.io/badge/Version-v7.1--ULTIMATE-purple.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader/releases/tag/v7.1-ultimate)
 [![Manifest](https://img.shields.io/badge/Manifest-MV3%20Compliant-blue.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
 [![Security](https://img.shields.io/badge/Security-Hardened%20%26%20Audited-emerald.svg)](https://github.com/ajaa268-bot/Suno-workspace-downloader)
