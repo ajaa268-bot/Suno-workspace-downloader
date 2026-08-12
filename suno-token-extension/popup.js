@@ -250,14 +250,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (el) el.addEventListener('input', savePreferences);
   });
 
-  // Refresh stats counter
+  // Refresh stats counter in real-time
   async function refreshStats() {
+    try {
+      const tab = await getSunoTab();
+      if (tab && tab.id) {
+        chrome.tabs.sendMessage(tab.id, { action: 'get_stats' }, (res) => {
+          if (chrome.runtime.lastError || !res) {
+            readStorageFallback();
+            return;
+          }
+          if (typeof res.total === 'number') {
+            if (trackCounter) trackCounter.textContent = res.total.toLocaleString();
+            const lbl = document.querySelector('.counter-lbl');
+            if (lbl) {
+              if (res.offloadedCount > 0) {
+                lbl.textContent = `Captured Songs (${res.offloadedCount.toLocaleString()} Offloaded + ${res.ramCount.toLocaleString()} RAM)`;
+              } else {
+                lbl.textContent = 'Captured Songs / 60,000 Buffer';
+              }
+            }
+            if (toggleScrollBtn) {
+              toggleScrollBtn.textContent = res.isAutoScrolling ? '⏹️ Stop Auto-Scroll' : '📜 Start Auto-Scroll';
+              toggleScrollBtn.style.background = res.isAutoScrolling ? '#ef4444' : '#8b5cf6';
+            }
+          }
+        });
+      } else {
+        readStorageFallback();
+      }
+    } catch(e) {
+      readStorageFallback();
+    }
+  }
+
+  function readStorageFallback() {
     try {
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         chrome.storage.local.get(['suno_captured_clips', 'offloaded_total_count', 'part_counter'], (result) => {
-          if (chrome.runtime.lastError) return;
-          const clips = (result && result.suno_captured_clips) ? result.suno_captured_clips : [];
-          const offloaded = (result && result.offloaded_total_count) ? result.offloaded_total_count : 0;
+          if (chrome.runtime.lastError || !result) return;
+          const clips = result.suno_captured_clips || [];
+          const offloaded = result.offloaded_total_count || 0;
           const currentTotal = offloaded + clips.length;
 
           if (trackCounter) trackCounter.textContent = currentTotal.toLocaleString();
@@ -274,21 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
     } catch(e) {}
-
-    try {
-      const tab = await getSunoTab();
-      if (tab && tab.id) {
-        chrome.tabs.sendMessage(tab.id, { action: 'get_stats' }, (res) => {
-          if (chrome.runtime.lastError) return;
-          if (res && typeof res.total === 'number') {
-            if (toggleScrollBtn) {
-              toggleScrollBtn.textContent = res.isAutoScrolling ? '⏹️ Stop Auto-Scroll' : '📜 Start Auto-Scroll';
-              toggleScrollBtn.style.background = res.isAutoScrolling ? '#ef4444' : '#8b5cf6';
-            }
-          }
-        });
-      }
-    } catch(e){}
   }
 
   refreshStats();

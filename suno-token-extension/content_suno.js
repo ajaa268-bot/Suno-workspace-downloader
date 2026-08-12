@@ -889,8 +889,12 @@
     }
 
     if (request.action === 'get_stats') {
+      const ramCount = window.__sunoSessionClips.size;
+      const grandTotal = totalOffloadedCount + ramCount;
       sendResponse({
-        total: window.__sunoSessionClips.size,
+        total: grandTotal,
+        ramCount: ramCount,
+        offloadedCount: totalOffloadedCount,
         isAutoScrolling: isAutoScrolling,
         isEngineActive: isCaptureEngineActive,
         lastAutoSavedCount: lastAutoSavedCount,
